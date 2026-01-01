@@ -4,6 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rock, Paper, Scissors</title>
+    <style>
+        * {
+            margin: 10px; /* Applies a 10px margin to all four sides of every element */
+        }
+        body {
+            font-family: sans-serif;
+        }
+        ul {
+            list-style-type: none; /* Removes the bullet points */
+            padding-left: 0;
+            margin-left: 0;  
+        }
+    </style>
+    <script src="javascript.js" defer></script>
 </head>
-<script src="javascript.js"></script>
+<body>
+    <h1>Rock, Paper, Scissors Game</h1>
+    <div>Choose one:</div>
+    <ul id="buttonContainer"></div>
+        <li><button id="rock">Rock</button></li>
+        <li><button id="paper">Paper</button></li>
+        <li><button id="scissors">Scissors</button></li>
+    </ul>
+    <div id="roundResult">
+        <span id ="result"></span> You chose<!--
+        --><span id ="humanChoice"></span>. The computer chose<!--
+        --><span id ="computerChoice"></span>.
+    </div>
+    <h2>Score</h2>
+    <div id="score">
+        <p>You: <span class="human"></span></p>
+        <p>Computer: <span class="computer"></span></p>
+    </div>
+    <dialog>
+        <h2>Game Over!</h2>
+        <p>You: <span class="human"></span></p>
+        <p>Computer: <span class="computer"></span></p>
+        <button autofocus>Close</button>
+    </dialog>
+</body>
 </html>

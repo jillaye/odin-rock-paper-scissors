@@ -1,40 +1,48 @@
 const choices = ["rock", "paper", "scissors"]
+let computerScore = 0;
+let humanScore = 0;
+const buttons = document.querySelector('#buttonContainer');
+const humanElements = document.querySelectorAll('.human');
+const computerElements = document.querySelectorAll('.computer');
+const humanChoice = document.getElementById('humanChoice')
+const computerChoice = document.getElementById('computerChoice')
+const roundResult = document.getElementById('roundResult');
+const result = document.getElementById('result');
+const dialog = document.querySelector("dialog");
+const closeButton = document.querySelector("dialog button");
 
+resetGame();
+
+closeButton.addEventListener('click', () => {
+    dialog.close();
+    resetGame();
+})
+
+// getComputerChoice randomly selects and returns one member from the choices array 
 function getComputerChoice() {
     const randomIdx = Math.floor(Math.random() * choices.length);
+    computerChoice.textContent = capitalizeFirstLetter(choices[randomIdx]);
     return choices[randomIdx]
 }
 
-function getHumanChoice() {
-    let choice = prompt("choose rock, paper, or scissors");
-    if (choice != null) {
-        choice = choice.toLowerCase()
-        if (choices.includes(choice)) {
-            return choice;
-        } else {
-            return("");
-        }
+// This is event listener for clicking any of the 3 buttons in the buttonContainer.
+// This event sets off the playing of one round of the rps game.
+buttons.addEventListener('click', (e) => {
+    let button = e.target;
+    let human = button.id;
+    humanChoice.textContent = capitalizeFirstLetter(human);
+    playRound(human, getComputerChoice());
+})
+
+// playRound plays one round of rps, based on the human and computer choices passed in.
+function playRound(humanChoice, computerChoice) {
+    let humanWins = true;
+    if (humanChoice === computerChoice) {
+        roundResult.hidden = false;
+        result.textContent = "Tie!";
+        return
     } else {
-        return("")
-    }
-}
-
-function sleep() {
-    // sleeps for 1.5 seconds (1500 msec)
-    return new Promise(resolve => setTimeout(resolve, 1500));
-}
-
-async function playGame() {
-    let humanScore = 0;
-    let computerScore = 0;
-
-    function playRound(humanChoice, computerChoice) {
-        if (humanChoice === computerChoice) {
-            console.log("   Tie!")
-            return
-        }
-        let humanWins = true;
-        switch (humanChoice.toLowerCase()) {
+        switch (humanChoice) {
             case "rock":
                 if (computerChoice === "paper") {
                     humanWins = false;
@@ -51,41 +59,63 @@ async function playGame() {
                 }
                 break;
             default:
-                console.log("Invalid choice. Try again.")
                 return;
         }
-        processResult(humanChoice, computerChoice, humanWins)
-    }
-
-    function processResult(humanChoice, computerChoice, humanWins) {
-        if (humanWins === true) {
-            humanScore++;
-            console.log(`   You win this round! ${capitalizeFirstLetter(humanChoice)} beats ${capitalizeFirstLetter(computerChoice)}.`)
-        } else {
-            computerScore++;
-            console.log(`   You lose this round! ${capitalizeFirstLetter(computerChoice)} beats ${capitalizeFirstLetter(humanChoice)}.`)
-        }
-    }
-
-    for (let x = 0; x < 5; x++) {
-        console.log(`Round ${x + 1}:`)
-        await sleep();
-        const human = getHumanChoice();
-        const computer = getComputerChoice();
-        playRound(human, computer);
-    }
-
-    if (humanScore > computerScore) {
-        console.log(`You WIN the game! Score ${humanScore} to ${computerScore}`)
-    } else if (humanScore === computerScore){
-        console.log("Tie game!")
-    } else {
-        console.log(`You LOST the game! Score ${humanScore} to ${computerScore}`)
+        roundResult.hidden = false;
+        humanWins ? result.value = "You win! " : result.value = "You lose! ";
+        tallyRound(humanChoice, computerChoice, humanWins)
     }
 }
 
+// setHumanScore sets all human element text content to score.
+function setHumanScore(score) {
+    humanElements.forEach(span => {
+        span.textContent = score;
+    })
+}
+
+// setComputerScore sets all computer element text content to score.
+function setComputerScore(score) {
+    computerElements.forEach(span => {
+        span.textContent = score;
+    })
+}
+
+// tallyRound keeps a running total of the rps game score. When either 
+// the human or the computer score reaches 5, it ends the game.
+function tallyRound(humanChoice, computerChoice, humanWins) {
+    if (humanWins === true) {
+        result.textContent = "You win!";
+        humanScore++;
+        setHumanScore(humanScore);
+    } else {
+        result.textContent = "You lose!";
+        computerScore++;
+        setComputerScore(computerScore);
+    }
+    if ((humanScore == 5) || (computerScore == 5)) {
+        processGameOver();
+    }
+}
+
+// processGameOver dispays a game over dialog which declares a winner and
+// displays the final score
+function processGameOver() {
+    dialog.showModal();
+}
+
+// resetGame sets all scores (and text content) back to zero and hides the 
+// round result
+function resetGame() {
+    humanScore = 0;
+    setHumanScore(humanScore);
+    computerScore = 0;
+    setComputerScore(computerScore);
+    roundResult.hidden = true;
+}
+
+// capitalizeFirstLetter returns the passed in string with the first character
+// capitalized
 function capitalizeFirstLetter(s) {
     return `${s.charAt(0).toUpperCase()}${s.slice(1)}`;
 }
-
-playGame()
