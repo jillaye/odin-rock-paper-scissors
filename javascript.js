@@ -1,6 +1,5 @@
+// File globals
 const choices = ["rock", "paper", "scissors"]
-let computerScore = 0;
-let humanScore = 0;
 const buttons = document.querySelector('#buttonContainer');
 const humanElements = document.querySelectorAll('.human');
 const computerElements = document.querySelectorAll('.computer');
@@ -9,11 +8,15 @@ const computerChoice = document.getElementById('computerChoice')
 const roundResult = document.getElementById('roundResult');
 const result = document.getElementById('result');
 const dialog = document.querySelector("dialog");
-const closeButton = document.querySelector("dialog button");
+const gameOverButton = document.querySelector("dialog button");
+let computerScore = 0;
+let humanScore = 0;
 
 resetGame();
 
-closeButton.addEventListener('click', () => {
+// Adds a click event listener to the close button of the dialog that appears
+// when the game is over.
+gameOverButton.addEventListener('click', () => {
     dialog.close();
     resetGame();
 })
@@ -26,45 +29,44 @@ function getComputerChoice() {
 }
 
 // This is event listener for clicking any of the 3 buttons in the buttonContainer.
-// This event sets off the playing of one round of the rps game.
+// This event sets off the playing of one round of the RPS game.
 buttons.addEventListener('click', (e) => {
+    roundResult.hidden = false;
     let button = e.target;
     let human = button.id;
+    let computer = getComputerChoice();
     humanChoice.textContent = capitalizeFirstLetter(human);
-    playRound(human, getComputerChoice());
+    computerChoice.textContent = capitalizeFirstLetter(computer);
+    if (human !== computer) {
+        let humanWins = playRound(human, computer);
+        humanWins ? result.textContent = "You win! " : result.textContent = "You lose! ";
+        tallyRound(humanWins);
+    } else {
+        result.textContent = "Tie!";
+    }
 })
 
-// playRound plays one round of rps, based on the human and computer choices passed in.
+// playRound plays one round of RPS, based on the human and computer choices passed in.
 function playRound(humanChoice, computerChoice) {
     let humanWins = true;
-    if (humanChoice === computerChoice) {
-        roundResult.hidden = false;
-        result.textContent = "Tie!";
-        return
-    } else {
-        switch (humanChoice) {
-            case "rock":
-                if (computerChoice === "paper") {
-                    humanWins = false;
-                }
-                break;
-            case "paper":
-                if (computerChoice === "scissors") {
-                    humanWins = false;
-                }
-                break;
-            case "scissors":
-                if (computerChoice === "rock") {
-                    humanWins = false;
-                }
-                break;
-            default:
-                return;
-        }
-        roundResult.hidden = false;
-        humanWins ? result.value = "You win! " : result.value = "You lose! ";
-        tallyRound(humanChoice, computerChoice, humanWins)
+    switch (humanChoice) {
+        case "rock":
+            if (computerChoice === "paper") {
+                humanWins = false;
+            }
+            break;
+        case "paper":
+            if (computerChoice === "scissors") {
+                humanWins = false;
+            }
+            break;
+        case "scissors":
+            if (computerChoice === "rock") {
+                humanWins = false;
+            }
+            break;
     }
+    return humanWins;
 }
 
 // setHumanScore sets all human element text content to score.
@@ -81,27 +83,19 @@ function setComputerScore(score) {
     })
 }
 
-// tallyRound keeps a running total of the rps game score. When either 
+// tallyRound keeps a running total of the RPS game score. When either 
 // the human or the computer score reaches 5, it ends the game.
-function tallyRound(humanChoice, computerChoice, humanWins) {
+function tallyRound(humanWins) {
     if (humanWins === true) {
-        result.textContent = "You win!";
         humanScore++;
         setHumanScore(humanScore);
     } else {
-        result.textContent = "You lose!";
         computerScore++;
         setComputerScore(computerScore);
     }
     if ((humanScore == 5) || (computerScore == 5)) {
-        processGameOver();
+        dialog.showModal();
     }
-}
-
-// processGameOver dispays a game over dialog which declares a winner and
-// displays the final score
-function processGameOver() {
-    dialog.showModal();
 }
 
 // resetGame sets all scores (and text content) back to zero and hides the 
